@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111426">
+  <meta name="description" content="Conecta tus herramientas y automatiza tareas sin escribir código. Crea flujos de trabajo con Nexo.">
+  <title>Nexo — Automatiza lo cotidiano</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17192a;
+      --muted: #6d7183;
+      --paper: #f7f8fc;
+      --purple: #7657f6;
+      --purple-dark: #6142e8;
+      --mint: #b7f4df;
+      --line: #e8e9f1;
+      --night: #111426;
+      --night-soft: #1b2037;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .wrap { width: min(1160px, calc(100% - 48px)); margin: 0 auto; }
+
+    .hero-shell {
+      position: relative;
+      overflow: hidden;
+      min-height: 690px;
+      color: #fff;
+      background:
+        radial-gradient(ellipse at 74% 52%, rgba(107, 81, 235, .2), transparent 34%),
+        radial-gradient(ellipse at 2% 0%, rgba(72, 81, 154, .16), transparent 34%),
+        var(--night);
+    }
+    .hero-shell::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 58px 58px;
+      mask-image: linear-gradient(to bottom, black, transparent 90%);
+    }
+    .topbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      height: 82px;
+      border-bottom: 1px solid rgba(255,255,255,.09);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 21px; font-weight: 750; letter-spacing: -.8px; }
+    .brand-mark {
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--purple);
+      box-shadow: 0 5px 18px rgba(118,87,246,.38);
+    }
+    .brand-mark svg { width: 19px; height: 19px; }
+    .nav-links { display: flex; align-items: center; gap: 34px; margin: 0 auto; color: #c4c6d3; font-size: 13px; font-weight: 550; }
+    .nav-links a, .login { transition: color .2s ease; }
+    .nav-links a:hover, .login:hover { color: #fff; }
+    .nav-actions { display: flex; align-items: center; gap: 22px; font-size: 13px; font-weight: 650; }
+    .login { color: #d3d4de; }
+    .button {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 19px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .button:hover { transform: translateY(-2px); }
+    .button-primary { background: var(--purple); color: white; box-shadow: 0 8px 22px rgba(118,87,246,.23); }
+    .button-primary:hover { background: #856afa; }
+    .button-small { min-height: 38px; padding: 0 15px; border-radius: 8px; }
+    .button-outline { border-color: rgba(255,255,255,.22); color: white; background: rgba(255,255,255,.03); }
+    .button-outline:hover { border-color: rgba(255,255,255,.48); background: rgba(255,255,255,.08); }
+    .menu-toggle { display: none; width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.15); border-radius: 9px; color: white; background: transparent; cursor: pointer; }
+
+    .hero {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      min-height: 600px;
+      grid-template-columns: 1fr 1.05fr;
+      align-items: center;
+      gap: 54px;
+      padding-top: 26px;
+      padding-bottom: 48px;
+    }
+    .hero-copy { max-width: 505px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 22px;
+      color: #d2c9ff;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 1.15px;
+      text-transform: uppercase;
+    }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 12px rgba(183,244,223,.85); }
+    h1 { margin: 0; font-size: clamp(43px, 5vw, 65px); line-height: 1.04; letter-spacing: -3.2px; font-weight: 760; }
+    h1 span { color: #a998ff; }
+    .hero-copy > p { max-width: 440px; margin: 22px 0 28px; color: #b9bbca; font-size: 16px; line-height: 1.75; }
+    .hero-buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+    .hero-note { display: flex; align-items: center; gap: 8px; margin-top: 19px; color: #aeb0c0; font-size: 11px; }
+    .hero-note svg { color: var(--mint); }
+
+    .flow-scene { position: relative; min-width: 0; padding: 35px 0 24px; }
+    .flow-glow { position: absolute; width: 440px; height: 330px; top: 50%; left: 50%; transform: translate(-50%,-50%); border-radius: 50%; background: rgba(93,71,206,.22); filter: blur(72px); }
+    .flow-window {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 15px;
+      background: rgba(25,29,49,.92);
+      box-shadow: 0 30px 90px rgba(0,0,0,.36), 0 0 0 7px rgba(255,255,255,.025);
+      transform: perspective(1200px) rotateY(-5deg) rotateX(2deg);
+    }
+    .window-bar { display: flex; height: 45px; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid rgba(255,255,255,.08); color: #c6c8d6; font-size: 10px; }
+    .window-title { display: flex; align-items: center; gap: 8px; }
+    .window-live { display: flex; align-items: center; gap: 6px; color: #a6e8ce; font-size: 9px; }
+    .window-live i { width: 6px; height: 6px; border-radius: 50%; background: #79deb7; }
+    .window-body {
+      position: relative;
+      display: grid;
+      min-height: 340px;
+      grid-template-columns: 50px 1fr;
+      background-image: radial-gradient(rgba(255,255,255,.12) .8px, transparent .8px);
+      background-size: 18px 18px;
+    }
+    .tool-rail { display: flex; align-items: center; flex-direction: column; gap: 15px; padding-top: 17px; border-right: 1px solid rgba(255,255,255,.07); background: rgba(17,20,38,.68); }
+    .rail-icon { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 7px; color: #878b9d; }
+    .rail-icon.active { color: #c9bcff; background: rgba(118,87,246,.2); }
+    .canvas { position: relative; min-width: 0; }
+    .connection {
+      position: absolute;
+      z-index: 0;
+      top: 114px;
+      left: 104px;
+      width: calc(100% - 210px);
+      height: 74px;
+      overflow: visible;
+    }
+    .node {
+      position: absolute;
+      z-index: 1;
+      width: 145px;
+      min-height: 72px;
+      padding: 11px 12px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 10px;
+      background: #22273e;
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
+    }
+    .node-one { top: 81px; left: 8%; }
+    .node-two { top: 174px; left: 38%; }
+    .node-three { top: 81px; right: 6%; }
+    .node-heading { display: flex; align-items: center; gap: 8px; color: #f1f1f7; font-size: 10px; font-weight: 700; }
+    .node-heading svg { width: 19px; height: 19px; flex: none; }
+    .node-caption { margin: 8px 0 0 27px; color: #a2a5b7; font-size: 8px; }
+    .node-status { position: absolute; top: -5px; right: -5px; display: grid; width: 15px; height: 15px; place-items: center; border: 2px solid #22273e; border-radius: 50%; color: #1a5947; background: #9ce5c8; }
+    .node-status svg { width: 8px; }
+    .canvas-caption { position: absolute; right: 14px; bottom: 13px; left: 14px; display: flex; justify-content: space-between; color: #9a9daf; font-size: 8px; }
+    .canvas-caption strong { color: #c9c6eb; font-weight: 600; }
+    .floating-run {
+      position: absolute;
+      right: -17px;
+      bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      background: #252a41;
+      box-shadow: 0 14px 35px rgba(0,0,0,.27);
+      color: #dbdce6;
+      font-size: 10px;
+    }
+    .run-check { display: grid; width: 23px; height: 23px; place-items: center; border-radius: 7px; color: #9be4c6; background: rgba(91,192,153,.17); }
+    .run-check svg { width: 13px; }
+    .floating-run strong { display: block; margin-bottom: 3px; color: white; font-size: 10px; }
+    .floating-run span { color: #a4a7b8; font-size: 8px; }
+
+    .trust-row { padding: 33px 0 39px; border-bottom: 1px solid var(--line); text-align: center; }
+    .trust-row > p { margin: 0 0 23px; color: #898c9d; font-size: 10px; font-weight: 750; letter-spacing: 1.2px; text-transform: uppercase; }
+    .logo-list { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: clamp(22px, 5vw, 61px); color: #85899a; }
+    .tool-logo { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 730; letter-spacing: -.5px; }
+    .tool-logo svg { width: 18px; height: 18px; }
+    .tool-logo small { font-size: 13px; font-weight: 650; }
+
+    .section { padding: 93px 0; }
+    .section-heading { max-width: 620px; margin: 0 auto 43px; text-align: center; }
+    .kicker { margin: 0 0 13px; color: var(--purple); font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; }
+    h2 { margin: 0; font-size: clamp(30px, 4vw, 43px); line-height: 1.12; letter-spacing: -1.8px; }
+    .section-heading > p:last-child { margin: 15px auto 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
+    .feature-card { min-height: 225px; padding: 25px; border: 1px solid var(--line); border-radius: 14px; background: #fff; transition: transform .2s ease, box-shadow .2s ease; }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 15px 34px rgba(26,28,54,.07); }
+    .feature-icon { display: grid; width: 42px; height: 42px; margin-bottom: 23px; place-items: center; border-radius: 12px; color: var(--purple); background: #f0edff; }
+    .feature-icon svg { width: 20px; height: 20px; }
+    .feature-card h3 { margin: 0 0 9px; font-size: 16px; letter-spacing: -.3px; }
+    .feature-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+
+    .bottom-cta { padding: 0 0 86px; }
+    .cta-panel {
+      position: relative;
+      display: flex;
+      min-height: 220px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 26px;
+      overflow: hidden;
+      padding: 42px 52px;
+      border-radius: 18px;
+      color: white;
+      background: linear-gradient(115deg, #262044, #372872 65%, #5945a9);
+    }
+    .cta-panel::after { position: absolute; top: -120px; right: 10%; width: 300px; height: 300px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; box-shadow: 0 0 0 35px rgba(255,255,255,.025), 0 0 0 70px rgba(255,255,255,.02); content: ""; }
+    .cta-copy { position: relative; z-index: 1; }
+    .cta-copy .kicker { color: #c3b9ff; }
+    .cta-copy h2 { max-width: 520px; font-size: 34px; }
+    .cta-copy p { margin: 11px 0 0; color: #cbc6dd; font-size: 13px; }
+    .cta-panel .button { position: relative; z-index: 1; flex: none; background: white; color: #4a379f; }
+    .cta-panel .button:hover { background: #f1edff; }
+    footer { border-top: 1px solid var(--line); background: #fff; }
+    .footer-inner { display: flex; min-height: 76px; align-items: center; justify-content: space-between; gap: 16px; color: #85899a; font-size: 11px; }
+    .footer-brand { color: var(--ink); font-size: 16px; }
+    .footer-links { display: flex; gap: 22px; }
+    .footer-links a:hover { color: var(--purple); }
+
+    @media (max-width: 900px) {
+      .hero-shell { min-height: auto; }
+      .hero { min-height: 580px; grid-template-columns: 1fr 1fr; gap: 27px; }
+      .flow-window { transform: none; }
+      .node { width: 125px; }
+      .node-one { left: 3%; }
+      .node-two { left: 35%; }
+      .node-three { right: 3%; }
+      .connection { left: 82px; width: calc(100% - 160px); }
+      .floating-run { right: -7px; }
+    }
+    @media (max-width: 680px) {
+      .wrap { width: min(100% - 36px, 500px); }
+      .topbar { height: 70px; justify-content: space-between; }
+      .nav-links { position: absolute; top: 69px; right: 0; left: 0; display: none; align-items: stretch; flex-direction: column; gap: 0; padding: 8px 18px 16px; border: 1px solid rgba(255,255,255,.1); border-radius: 0 0 12px 12px; background: #171a2d; }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 12px 2px; }
+      .nav-actions { margin-left: auto; margin-right: 12px; }
+      .nav-actions .login { display: none; }
+      .nav-actions .button { min-height: 36px; padding: 0 12px; font-size: 11px; }
+      .menu-toggle { display: grid; place-items: center; }
+      .hero { min-height: auto; grid-template-columns: 1fr; gap: 17px; padding-top: 61px; padding-bottom: 55px; }
+      .hero-copy { max-width: 100%; }
+      h1 { max-width: 530px; font-size: clamp(43px, 11vw, 58px); letter-spacing: -2.6px; }
+      .hero-copy > p { max-width: 480px; font-size: 14px; }
+      .flow-scene { width: 100%; max-width: 520px; margin: 0 auto; padding: 18px 6px 25px; }
+      .window-body { min-height: 300px; }
+      .node-one { top: 67px; left: 3%; }
+      .node-two { top: 160px; left: 35%; }
+      .node-three { top: 67px; right: 3%; }
+      .node { width: clamp(105px, 31vw, 138px); padding: 10px 8px; }
+      .node-heading { gap: 5px; font-size: 9px; }
+      .node-caption { margin-left: 24px; font-size: 7px; }
+      .connection { top: 105px; left: 69px; width: calc(100% - 130px); }
+      .floating-run { right: 1px; bottom: -3px; }
+      .trust-row { padding: 27px 0 31px; }
+      .logo-list { gap: 17px 27px; }
+      .tool-logo { font-size: 12px; }
+      .section { padding: 68px 0; }
+      .section-heading { margin-bottom: 30px; }
+      .feature-grid { grid-template-columns: 1fr; gap: 12px; }
+      .feature-card { min-height: 0; padding: 22px; }
+      .feature-icon { margin-bottom: 16px; }
+      .bottom-cta { padding-bottom: 60px; }
+      .cta-panel { align-items: flex-start; flex-direction: column; padding: 34px 27px; }
+      .cta-copy h2 { font-size: 29px; }
+      .cta-panel::after { right: -170px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; padding: 20px 0; }
+      .footer-links { flex-wrap: wrap; gap: 14px 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hero-shell">
+    <header class="topbar wrap">
+      <a class="brand" href="#" aria-label="Nexo, inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 7.5h5.5L19 17M19 7h-5.5L5 17" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        nexo
+      </a>
+      <nav class="nav-links" id="main-navigation" aria-label="Navegación principal">
+        <a href="#producto">Producto</a>
+        <a href="#integraciones">Integraciones</a>
+        <a href="#como-funciona">Cómo funciona</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="login" href="#contacto">Iniciar sesión</a>
+        <a class="button button-primary button-small" href="#contacto">Empieza gratis <span aria-hidden="true">→</span></a>
+      </div>
+      <button class="menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="main-navigation">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+
+    <main>
+      <section class="hero wrap" id="producto">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> Automatización, sin complicaciones</div>
+          <h1>Tu trabajo fluye.<br><span>Lo repetitivo, no.</span></h1>
+          <p>Conecta las herramientas que ya usas y deja que Nexo se encargue de las tareas que te quitan tiempo. Sin código. Sin vueltas.</p>
+          <div class="hero-buttons">
+            <a class="button button-primary" href="#contacto">Crea tu primer flujo <span aria-hidden="true">→</span></a>
+            <a class="button button-outline" href="#como-funciona">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 6 9 6-9 6V6Z" fill="currentColor"/></svg>
+              Ver cómo funciona
+            </a>
+          </div>
+          <div class="hero-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Gratis para empezar. No necesitas tarjeta.
+          </div>
+        </div>
+
+        <div class="flow-scene" aria-label="Vista de un flujo que conecta un formulario con inteligencia artificial y Slack">
+          <div class="flow-glow"></div>
+          <div class="flow-window">
+            <div class="window-bar">
+              <div class="window-title"><span style="color:#a998ff">◈</span> Nuevo lead → equipo de ventas</div>
+              <div class="window-live"><i></i> Flujo activo</div>
+            </div>
+            <div class="window-body">
+              <div class="tool-rail" aria-hidden="true">
+                <span class="rail-icon active"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.7"/></svg></span>
+                <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+                <span class="rail-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h14M5 17h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+              </div>
+              <div class="canvas">
+                <svg class="connection" viewBox="0 0 340 90" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M5 12 C60 12 55 73 125 73 S205 12 270 12 H335" fill="none" stroke="#8470ec" stroke-width="2" stroke-dasharray="5 5"/>
+                  <circle cx="5" cy="12" r="3" fill="#b5a6ff"/><circle cx="335" cy="12" r="3" fill="#b5a6ff"/>
+                </svg>
+                <div class="node node-one">
+                  <span class="node-status"><svg viewBox="0 0 12 12" fill="none"><path d="m2 6 2.5 2.5L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                  <div class="node-heading">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="14" rx="3" fill="#7657f6"/><path d="m6 8 6 5 6-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Nuevo formulario
+                  </div>
+                  <div class="node-caption">Cuando llega una respuesta</div>
+                </div>
+                <div class="node node-two">
+                  <span class="node-status"><svg viewBox="0 0 12 12" fill="none"><path d="m2 6 2.5 2.5L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                  <div class="node-heading">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="#4a8fcb"/><path d="m8 12 2.5 2.5L16.5 8" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Enriquecer lead
+                  </div>
+                  <div class="node-caption">Organiza los datos con IA</div>
+                </div>
+                <div class="node node-three">
+                  <span class="node-status"><svg viewBox="0 0 12 12" fill="none"><path d="m2 6 2.5 2.5L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                  <div class="node-heading">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="#dc8a53"/><path d="M8 8h8M8 12h5M8 16h7" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Avisar al equipo
+                  </div>
+                  <div class="node-caption">Envía el resumen a Slack</div>
+                </div>
+                <div class="canvas-caption"><span><strong>3 pasos</strong> · Última ejecución hace 2 min</span><span>100%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="floating-run">
+            <div class="run-check"><svg viewBox="0 0 16 16" fill="none"><path d="m3 8 3.2 3.2L13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div><strong>Todo en orden</strong><span>Flujo ejecutado en 1,2 s</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section class="trust-row" id="integraciones">
+    <div class="wrap">
+      <p>Tus herramientas favoritas, trabajando juntas</p>
+      <div class="logo-list" aria-label="Herramientas compatibles">
+        <span class="tool-logo"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" fill="#4b9f70"/><path d="m7 12 3.2 3.2L17 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Notion</span>
+        <span class="tool-logo"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#5183dd"/><path d="M7.5 12h9M12 7.5v9" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>HubSpot</span>
+        <span class="tool-logo"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="6" fill="#6848c7"/><path d="m8 8 8 8m0-8-8 8" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><small>Slack</small></span>
+        <span class="tool-logo"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" fill="#d78a42"/><path d="M7.5 8.5h9v7h-9zM10 6v2.5m4-2.5v2.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>Airtable</span>
+        <span class="tool-logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 21 19H3L12 3Z" fill="#e2b94f"/><path d="M12 9v4m0 3h.01" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Google Sheets</span>
+        <span class="tool-logo"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#4b8cb5"/><path d="M7 12h10M12 7v10" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>+ 200 más</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="como-funciona">
+    <div class="section-heading">
+      <p class="kicker">Menos clics. Más impacto.</p>
+      <h2>Automatizar debería ser así de fácil.</h2>
+      <p>Todo lo que necesitas para conectar tus procesos, desde la primera idea hasta el flujo que trabaja por ti.</p>
+    </div>
+    <div class="feature-grid">
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="13" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M10 7.5h2a2 2 0 0 1 2 2v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Arma flujos a tu manera</h3>
+        <p>Conecta pasos en un lienzo visual. Arrastra, suelta y dale forma a procesos que antes vivían en mil pestañas.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.64 5.64l2.12 2.12m8.48 8.48 2.12 2.12m0-12.72-2.12 2.12m-8.48 8.48-2.12 2.12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/></svg></div>
+        <h3>Deja que la IA te ayude</h3>
+        <p>Resume, clasifica y transforma información en el momento justo. Tú decides qué automatizar y cuándo.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 13a8 8 0 1 1 2.34 5.66M4 18v-5h5m3-7v6l4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Siempre sabes qué pasa</h3>
+        <p>Consulta ejecuciones, detecta errores y revisa cada paso con claridad. Sin cajas negras ni sorpresas.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="bottom-cta wrap" id="contacto">
+    <div class="cta-panel">
+      <div class="cta-copy">
+        <p class="kicker">Tu tiempo vale más</p>
+        <h2>Haz espacio para el trabajo que importa.</h2>
+        <p>Empieza gratis y descubre qué puedes dejar de hacer a mano.</p>
+      </div>
+      <a class="button" href="mailto:hola@nexo.app?subject=Quiero%20probar%20Nexo">Hablemos de Nexo <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner wrap">
+      <a class="brand footer-brand" href="#" aria-label="Nexo, inicio">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 7.5h5.5L19 17M19 7h-5.5L5 17" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        nexo
+      </a>
+      <span>© 2026 Nexo. Automatiza con intención.</span>
+      <div class="footer-links"><a href="#producto">Producto</a><a href="#integraciones">Integraciones</a><a href="mailto:hola@nexo.app">Contacto</a></div>
+    </div>
+  </footer>
+  <script>
+    const menuButton = document.querySelector(".menu-toggle");
+    const navigation = document.querySelector(".nav-links");
+
+    menuButton.addEventListener("click", () => {
+      const isExpanded = menuButton.getAttribute("aria-expanded") === "true";
+      menuButton.setAttribute("aria-expanded", String(!isExpanded));
+      menuButton.setAttribute("aria-label", isExpanded ? "Abrir menú" : "Cerrar menú");
+      navigation.classList.toggle("open", !isExpanded);
+    });
+
+    navigation.addEventListener("click", (event) => {
+      if (event.target instanceof HTMLAnchorElement) {
+        navigation.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "Abrir menú");
+      }
+    });
+  </script>
+</body>
+</html>
